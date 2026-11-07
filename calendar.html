@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記事カレンダー | くらしの便利ガイド</title>
+<style>
+body {
+  font-family: sans-serif;
+  color: #263445;
+  background: #f5f8fc;
+  margin: 0;
+  padding: 16px;
+}
+.box {
+  max-width: 680px;
+  margin: auto;
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+}
+h2 {
+  text-align: center;
+  color: #2563eb;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 16px 0;
+}
+button {
+  background: #2563eb;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+th, td {
+  text-align: center;
+  height: 46px;
+}
+th {
+  color: #667085;
+}
+td a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: bold;
+}
+td a:hover {
+  background: #2563eb;
+  color: white;
+}
+.note {
+  text-align: center;
+  color: #667085;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>📅 記事カレンダー</h2>
+  <div class="controls">
+    <button onclick="changeMonth(-1)">◀ 前月</button>
+    <strong id="month"></strong>
+    <button onclick="changeMonth(1)">翌月 ▶</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>日</th><th>月</th><th>火</th>
+        <th>水</th><th>木</th><th>金</th><th>土</th>
+      </tr>
+    </thead>
+    <tbody id="days"></tbody>
+  </table>
+  <p class="note">
+    青い日付を押すと、その日の記事が開きます。
+  </p>
+</div>
+
+<script>
+const articleDates = new Set(["2026-11-08"]);
+let current = new Date();
+current.setDate(1);
+
+function changeMonth(amount) {
+  current.setMonth(current.getMonth() + amount);
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const year = current.getFullYear();
+  const month = current.getMonth();
+
+  document.getElementById("month").textContent =
+    year + "年" + (month + 1) + "月";
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDay = new Date(year, month + 1, 0).getDate();
+
+  let output = "<tr>";
+  let cellCount = 0;
+
+  for (let i = 0; i < firstDay; i++) {
+    output += "<td></td>";
+    cellCount++;
+  }
+
+  for (let day = 1; day <= lastDay; day++) {
+    const dateId =
+      year + "-" +
+      String(month + 1).padStart(2, "0") + "-" +
+      String(day).padStart(2, "0");
+
+    if (articleDates.has(dateId)) {
+      output +=
+        '<td><a href="articles/' +
+        dateId +
+        '.html" target="_top">' +
+        day +
+        '</a></td>';
+    } else {
+      output += "<td>" + day + "</td>";
+    }
+
+    cellCount++;
+
+    if (cellCount % 7 === 0 && day !== lastDay) {
+      output += "</tr><tr>";
+    }
+  }
+
+  while (cellCount % 7 !== 0) {
+    output += "<td></td>";
+    cellCount++;
+  }
+
+  output += "</tr>";
+
+  document.getElementById("days").innerHTML = output;
+}
+
+renderCalendar();
+</script>
+</body>
+</html>
